@@ -4,68 +4,170 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Will You Be My Valentine?</title>
+
   <style>
-    body {
-  margin: 0;
-  min-height: 100vh;
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      background-color: #000; /* prevents white flash on iPhone overscroll */
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
 
-  background-image: url("images/IMG_3227.jpg");
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
-  background-attachment: scroll;
+    /* Background on a wrapper is more reliable on iPhone */
+    .page {
+      min-height: 100vh;
+      background-image: url("images/IMG_3227.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center center;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
 
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
+    /* “Screens” for the flow */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      box-sizing: border-box;
 
-    @media (max-width: 600px) {
-  button {
-    width: 95%;
-    max-width: 420px;
-    padding: 32px 0;
-    font-size: 32px;
-    border-radius: 22px;
-    min-height: 80px;
-  }
-}
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 
-}
+      padding: 24px 16px;
+      gap: 18px;
+    }
 
+    .screen.active {
+      display: flex;
+    }
+
+    h1, h2, p {
+      margin: 0;
+      color: white; /* change if your background is bright */
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 22px;
+      min-height: 80px;
+      width: 95%;
+      max-width: 420px;
+      padding: 32px 0;
+      font-size: 32px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+      transition: transform 0.12s ease;
+    }
+
+    button:active {
+      transform: scale(0.96);
+    }
 
     #yes {
       background: #ff4d6d;
       color: white;
-      border: none;
-      border-radius: 8px;
+      font-weight: 700;
     }
+
     #no {
-      position: absolute;
+      background: rgba(255,255,255,0.9);
+      color: #111;
+      position: absolute; /* required for moveNo() */
+      min-height: 64px;
+      padding: 22px 0;
+      font-size: 26px;
+      max-width: 320px;
+    }
+
+    @media (min-width: 601px) {
+      button {
+        width: auto;
+        padding: 22px 44px;
+        font-size: 26px;
+        min-height: 70px;
+      }
+
+      #no {
+        padding: 18px 36px;
+        font-size: 22px;
+        min-height: 56px;
+      }
     }
   </style>
 </head>
+
 <body>
+  <div class="page">
 
-  <h1>Will you be my Valentine? 💘</h1>
+    <!-- Screen 1 -->
+    <div class="screen active" id="screen1">
+      <h1>Will you be my Valentine?</h1>
+      <button id="yes" onclick="goTo('screen2')">Yes</button>
+      <button id="no" onmouseover="moveNo()">No</button>
+      <h2 id="response"></h2>
+    </div>
 
-  <button id="yes" onclick="sayYes()">Yes</button>
-  <button id="no" onmouseover="moveNo()">No</button>
+    <!-- Screen 2 -->
+    <div class="screen" id="screen2">
+      <h1>Good choice.</h1>
+      <p>One more thing…</p>
+      <button id="yes" onclick="goTo('screen3')">Continue</button>
+    </div>
 
-  <h2 id="response"></h2>
+    <!-- Screen 3 -->
+    <div class="screen" id="screen3">
+      <h1>Be mine forever?</h1>
+      <button id="yes" onclick="finalYes()">Absolutely</button>
+    </div>
+
+  </div>
 
   <script>
-    function sayYes() {
-      document.getElementById("response").textContent = "Yay!!! ❤️";
+    function goTo(screenId) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(screenId).classList.add("active");
+
+      // keep the "No" button from being stuck off-screen if user comes back later
+      const noBtn = document.getElementById("no");
+      if (noBtn) {
+        noBtn.style.left = "";
+        noBtn.style.top = "";
+      }
+    }
+
+    function finalYes() {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById("screen3").innerHTML = `
+        <h1>Best decision you’ve made today.</h1>
+        <p>❤️</p>
+        <button id="yes" onclick="goTo('screen1')">Replay</button>
+      `;
+      document.getElementById("screen3").classList.add("active");
     }
 
     function moveNo() {
-      const x = Math.random() * (window.innerWidth - 100);
-      const y = Math.random() * (window.innerHeight - 100);
       const noBtn = document.getElementById("no");
+      const pad = 12;
+
+      const btnW = noBtn.offsetWidth || 160;
+      const btnH = noBtn.offsetHeight || 70;
+
+      const maxX = Math.max(pad, window.innerWidth - btnW - pad);
+      const maxY = Math.max(pad, window.innerHeight - btnH - pad);
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
       noBtn.style.left = x + "px";
       noBtn.style.top = y + "px";
     }
   </script>
-
 </body>
 </html>
