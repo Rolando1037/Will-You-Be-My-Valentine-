@@ -17,18 +17,13 @@
 
     /* Background on a wrapper is more reliable on iPhone */
     .page {
-  min-height: 100svh; /* small viewport height */
-  background-image: url("images/IMG_3135.jpg");
+  background-image: url("images/IMG_3227.jpg");
   background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center center;
-
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
+  background-size: contain;
+  background-position: center top;
+  background-color: #000; /* fills any leftover space */
 }
-
+    
     /* “Screens” for the flow */
     .screen {
   display: none;
