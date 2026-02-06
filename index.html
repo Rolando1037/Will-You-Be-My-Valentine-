@@ -10,35 +10,33 @@
       margin: 0;
       padding: 0;
       min-height: 100%;
-      background-color: #000; /* prevents white flash on iPhone overscroll */
+      background-color: #000;
       font-family: Arial, sans-serif;
       text-align: center;
     }
 
-    /* Background on a wrapper is more reliable on iPhone */
-   .page {
-  transition: background-image 0.6s ease-in-out;
-}
-  min-height: 100svh;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-color: #000;
-  background-size: contain; /* or cover */
-}
-    
-    /* “Screens” for the flow */
+    /* Background wrapper */
+    .page {
+      min-height: 100svh;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-color: #000;
+      background-size: contain; /* change to cover if you want full-bleed */
+      transition: background-image 0.6s ease-in-out;
+    }
+
+    /* Flow screens */
     .screen {
-  display: none;
-  box-sizing: border-box;
+      display: none;
+      box-sizing: border-box;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
 
-  padding: 24px 16px;
-  gap: 18px;
-}
+      padding: 24px 16px;
+      gap: 18px;
+    }
 
     .screen.active {
       display: flex;
@@ -46,7 +44,7 @@
 
     h1, h2, p {
       margin: 0;
-      color: white; /* change if your background is bright */
+      color: white;
       text-shadow: 0 2px 10px rgba(0,0,0,0.6);
     }
 
@@ -76,25 +74,29 @@
     #no {
       background: rgba(255,255,255,0.9);
       color: #111;
-      position: absolute; /* required for moveNo() */
+      position: absolute;
       min-height: 52px;
       padding: 14px 0;
       font-size: 18px;
+      width: 70%;
       max-width: 260px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
     }
 
     @media (min-width: 601px) {
       button {
         width: auto;
-        padding: 22px 44px;
-        font-size: 26px;
-        min-height: 70px;
+        padding: 16px 32px;
+        font-size: 20px;
+        min-height: 56px;
       }
 
       #no {
-        padding: 18px 36px;
-        font-size: 22px;
-        min-height: 56px;
+        width: auto;
+        padding: 14px 28px;
+        font-size: 18px;
+        min-height: 50px;
+        max-width: none;
       }
     }
   </style>
@@ -127,11 +129,32 @@
   </div>
 
   <script>
+    // Rotate background images (list filenames exactly, case-sensitive)
+    const images = [
+      "images/IMG_0208 (1).jpg",
+      "images/IMG_0209.jpg",
+      "images/IMG_3135.jpg"
+    ];
+
+    let idx = 0;
+
+    function setBackground(i) {
+      const page = document.querySelector(".page");
+      page.style.backgroundImage = `url("${images[i]}")`;
+    }
+
+    setBackground(idx);
+
+    setInterval(() => {
+      idx = (idx + 1) % images.length;
+      setBackground(idx);
+    }, 10000);
+
+    // Flow navigation
     function goTo(screenId) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(screenId).classList.add("active");
 
-      // keep the "No" button from being stuck off-screen if user comes back later
       const noBtn = document.getElementById("no");
       if (noBtn) {
         noBtn.style.left = "";
@@ -141,12 +164,14 @@
 
     function finalYes() {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-      document.getElementById("screen3").innerHTML = `
+
+      const s3 = document.getElementById("screen3");
+      s3.innerHTML = `
         <h1>Best decision you’ve made today.</h1>
         <p>❤️</p>
         <button id="yes" onclick="goTo('screen1')">Replay</button>
       `;
-      document.getElementById("screen3").classList.add("active");
+      s3.classList.add("active");
     }
 
     function moveNo() {
@@ -165,66 +190,6 @@
       noBtn.style.left = x + "px";
       noBtn.style.top = y + "px";
     }
- <script>
-  // 1) List your image filenames exactly (case-sensitive)
-  const images = [
-    "images/IMG_0208 (1).jpg",
-    "images/IMG_0209.jpg",
-    "images/IMG_3135.jpg"
-  ];
-
-  let idx = 0;
-
-  function setBackground(i) {
-    const page = document.querySelector(".page");
-    page.style.backgroundImage = `url("${images[i]}")`;
-  }
-
-  // 2) Start immediately
-  setBackground(idx);
-
-  // 3) Rotate every 10 seconds
-  setInterval(() => {
-    idx = (idx + 1) % images.length;
-    setBackground(idx);
-  }, 10000);
-
-  // --- your existing functions ---
-  function goTo(screenId) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(screenId).classList.add("active");
-
-    const noBtn = document.getElementById("no");
-    if (noBtn) {
-      noBtn.style.left = "";
-      noBtn.style.top = "";
-    }
-  }
-
-  function finalYes() {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById("screen3").innerHTML = `
-      <h1>Best decision you’ve made today.</h1>
-      <p>❤️</p>
-      <button id="yes" onclick="goTo('screen1')">Replay</button>
-    `;
-    document.getElementById("screen3").classList.add("active");
-  }
-
-  function moveNo() {
-    const noBtn = document.getElementById("no");
-    const pad = 12;
-
-    const btnW = noBtn.offsetWidth || 160;
-    const btnH = noBtn.offsetHeight || 70;
-
-    const maxX = Math.max(pad, window.innerWidth - btnW - pad);
-    const maxY = Math.max(pad, window.innerHeight - btnH - pad);
-
-    noBtn.style.left = (Math.random() * maxX) + "px";
-    noBtn.style.top  = (Math.random() * maxY) + "px";
-  }
-</script>
-  
+  </script>
 </body>
 </html>
