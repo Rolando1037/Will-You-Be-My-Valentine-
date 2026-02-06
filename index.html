@@ -77,6 +77,8 @@
       background: rgba(255,255,255,0.9);
       color: #111;
       position: absolute;
+      z-index: 10;
+      touch-action: manipulation;
       min-height: 52px;
       padding: 14px 0;
       font-size: 18px;
@@ -111,7 +113,7 @@
     <div class="screen active" id="screen1">
       <h1>Will you be my Valentine?</h1>
       <button id="yes" onclick="goTo('screen2')">Yes</button>
-      <button id="no" onmouseover="moveNo()">No</button>
+      <button id="no" onpointerenter="moveNo()" ontouchstart="moveNo()">No</button>
       <h2 id="response"></h2>
     </div>
 
