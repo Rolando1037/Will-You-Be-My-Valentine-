@@ -37,6 +37,10 @@
       padding: 24px 16px;
       gap: 18px;
       position: relative;
+
+      /* makes the whole area feel tappable */
+      cursor: pointer;
+      touch-action: manipulation;
     }
 
     .screen.active {
@@ -49,13 +53,8 @@
       text-shadow: 0 2px 10px rgba(0,0,0,0.6);
     }
 
-    /* Screen 1: tap anywhere */
-    #screen1 {
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    #screen1 p {
+    /* Small floating hint text (screens 1–3) */
+    .hint {
       margin-top: 10px;
       font-size: 18px;
       opacity: 0.9;
@@ -67,6 +66,7 @@
       50% { opacity: 1; transform: translateY(-2px); }
     }
 
+    /* Buttons (only used on screen 4 in this version) */
     button {
       cursor: pointer;
       border: none;
@@ -105,30 +105,40 @@
   <div class="page">
 
     <!-- Screen 1 (tap anywhere) -->
-    <div class="screen active" id="screen1" onclick="goTo('screen2')">
-      <h1>Some of my faviorte memories with you</h1>
-      <p>(Tap anywhere.)</p>
+    <div class="screen active" id="screen1" data-next="screen2">
+      <h1>Some of my favorite memories with you</h1>
+      <p class="hint">(Tap anywhere.)</p>
     </div>
 
-    <!-- Screen 2 -->
-    <div class="screen" id="screen2">
-      <h1>You make my life complete </h1>
-      <p>(Tap again.)</p>
+    <!-- Screen 2 (tap anywhere) -->
+    <div class="screen" id="screen2" data-next="screen3">
+      <h1>You make my life complete</h1>
+      <p class="hint">(Tap again.)</p>
     </div>
 
-    <!-- Screen 3 -->
-    <div class="screen" id="screen3">
-      <h1>I have a question to ask you?</h1>
+    <!-- Screen 3 (tap anywhere) -->
+    <div class="screen" id="screen3" data-next="screen4">
+      <h1>I have a question to ask you…</h1>
+      <p class="hint">(Tap one more time.)</p>
+    </div>
+
+    <!-- Screen 4 (final screen - no floating hint text) -->
+    <div class="screen" id="screen4" style="cursor: default;">
+      <h1>Will you be my Valentine?</h1>
+      <button id="yes" onclick="replay()">Yes</button>
     </div>
 
   </div>
 
   <script>
-    // Rotate background images (list filenames exactly, case-sensitive)
+    // Add as many as you want here (exact filenames, case-sensitive)
     const images = [
       "images/IMG_0208 (1).jpg",
       "images/IMG_0209.jpg",
-      "images/IMG_3135.jpg"
+      "images/IMG_3135.jpg",
+      "images/IMG_3227.jpg",
+      "images/IMG_3228.jpg"
+      // add more like: "images/whatever.jpg",
     ];
 
     let idx = 0;
@@ -147,22 +157,21 @@
       setBackground(idx);
     }, 10000);
 
-    // Flow navigation
     function goTo(screenId) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(screenId).classList.add("active");
     }
 
-    function finalYes() {
-      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    // Tap-anywhere flow for screens that have data-next
+    document.querySelectorAll(".screen[data-next]").forEach(screen => {
+      screen.addEventListener("click", () => {
+        const next = screen.getAttribute("data-next");
+        if (next) goTo(next);
+      });
+    });
 
-      const s3 = document.getElementById("screen3");
-      s3.innerHTML = `
-        <h1>Best decision you’ve made today.</h1>
-        <p>❤️</p>
-        <button id="yes" onclick="goTo('screen1')">Replay</button>
-      `;
-      s3.classList.add("active");
+    function replay() {
+      goTo("screen1");
     }
   </script>
 </body>
