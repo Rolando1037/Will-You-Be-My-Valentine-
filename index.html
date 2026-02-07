@@ -22,7 +22,7 @@
       background-position: center;
       background-color: #000;
       background-size: contain; /* change to cover if you want full-bleed */
-      transition: background-image 0.6s ease-in-out;
+      transition: background-image 0.4s ease-in-out;
     }
 
     /* Flow screens */
@@ -39,7 +39,6 @@
       position: relative;
     }
 
-
     .screen.active {
       display: flex;
     }
@@ -48,6 +47,24 @@
       margin: 0;
       color: white;
       text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+
+    /* Screen 1: tap anywhere */
+    #screen1 {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    #screen1 p {
+      margin-top: 10px;
+      font-size: 18px;
+      opacity: 0.9;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.55; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-2px); }
     }
 
     button {
@@ -73,34 +90,12 @@
       font-weight: 700;
     }
 
-    #no {
-      background: rgba(255,255,255,0.9);
-      color: #111;
-      position: absolute;
-      z-index: 10;
-      touch-action: manipulation;
-      min-height: 52px;
-      padding: 14px 0;
-      font-size: 18px;
-      width: 70%;
-      max-width: 260px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
-    }
-
     @media (min-width: 601px) {
       button {
         width: auto;
         padding: 16px 32px;
         font-size: 20px;
         min-height: 56px;
-      }
-
-      #no {
-        width: auto;
-        padding: 14px 28px;
-        font-size: 18px;
-        min-height: 50px;
-        max-width: none;
       }
     }
   </style>
@@ -109,12 +104,10 @@
 <body>
   <div class="page">
 
-    <!-- Screen 1 -->
-    <div class="screen active" id="screen1">
-      <h1>Will you be my Valentine?</h1>
-      <button id="yes" onclick="goTo('screen2')">Yes</button>
-      <button id="no" onpointerenter="moveNo()" ontouchstart="moveNo()">No</button>
-      <h2 id="response"></h2>
+    <!-- Screen 1 (tap anywhere) -->
+    <div class="screen active" id="screen1" onclick="goTo('screen2')">
+      <h1>Tap anywhere.</h1>
+      <p>(I have a question for you.)</p>
     </div>
 
     <!-- Screen 2 -->
@@ -147,8 +140,10 @@
       page.style.backgroundImage = `url("${images[i]}")`;
     }
 
+    // start immediately
     setBackground(idx);
 
+    // rotate every 10 seconds
     setInterval(() => {
       idx = (idx + 1) % images.length;
       setBackground(idx);
@@ -158,12 +153,6 @@
     function goTo(screenId) {
       document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
       document.getElementById(screenId).classList.add("active");
-
-      const noBtn = document.getElementById("no");
-      if (noBtn) {
-        noBtn.style.left = "";
-        noBtn.style.top = "";
-      }
     }
 
     function finalYes() {
@@ -176,23 +165,6 @@
         <button id="yes" onclick="goTo('screen1')">Replay</button>
       `;
       s3.classList.add("active");
-    }
-
-    function moveNo() {
-      const noBtn = document.getElementById("no");
-      const pad = 12;
-
-      const btnW = noBtn.offsetWidth || 160;
-      const btnH = noBtn.offsetHeight || 70;
-
-      const maxX = Math.max(pad, window.innerWidth - btnW - pad);
-      const maxY = Math.max(pad, window.innerHeight - btnH - pad);
-
-      const x = Math.random() * maxX;
-      const y = Math.random() * maxY;
-
-      noBtn.style.left = x + "px";
-      noBtn.style.top = y + "px";
     }
   </script>
 </body>
